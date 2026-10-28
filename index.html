@@ -1,0 +1,529 @@
+<!doctype html>
+<html lang="zh-Hant"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#f5f5f0"><meta name="description" content="國際專案管理期中考題庫，150 題觀念選擇與 9 題計算選擇。支援主題練習、隨機抽題、錯題複習、計算草稿及公式速查。"><meta name="apple-mobile-web-app-title" content="專案管理刷題"><meta name="apple-mobile-web-app-capable" content="yes"><title>國際專案管理刷題｜期中考複習</title><link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E📋%3C/text%3E%3C/svg%3E"><style>
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang TC", "Microsoft JhengHei", "Helvetica Neue", sans-serif;
+    background: #f5f5f0;
+    color: #1f1f1d;
+    line-height: 1.6;
+    font-size: 15px;
+    padding: 16px;
+    max-width: 600px;
+    margin: 0 auto;
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+  h1 { font-size: 22px; font-weight: 600; margin: 8px 0 16px; }
+  h2 { font-size: 17px; font-weight: 600; margin: 20px 0 10px; color: #555; }
+  .stat-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  .stat-card {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 14px;
+    border: 1px solid #e8e6df;
+  }
+  .stat-label {
+    font-size: 12px;
+    color: #888;
+    margin-bottom: 4px;
+  }
+  .stat-num {
+    font-size: 24px;
+    font-weight: 600;
+    color: #1f1f1d;
+  }
+  /* 期中/期末切換 */
+  .exam-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+  .exam-tab {
+    flex: 1;
+    padding: 12px;
+    background: #ffffff;
+    border: 1px solid #e8e6df;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 600;
+    font-family: inherit;
+    color: #888;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .exam-tab:active { transform: scale(0.98); }
+  .exam-tab.active {
+    background: #185fa5;
+    color: #ffffff;
+    border-color: #185fa5;
+  }
+  .exam-tab .tab-sub {
+    display: block;
+    font-size: 11px;
+    font-weight: 400;
+    margin-top: 2px;
+    opacity: 0.85;
+  }
+  .search-wrap {
+    margin-bottom: 16px;
+  }
+  .search-input {
+    width: 100%;
+    padding: 11px 14px;
+    background: #ffffff;
+    border: 1px solid #e8e6df;
+    border-radius: 12px;
+    font-size: 15px;
+    font-family: inherit;
+    color: #1f1f1d;
+    -webkit-appearance: none;
+    appearance: none;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .search-input:focus {
+    border-color: #185fa5;
+  }
+  #search-results {
+    margin-top: 10px;
+    display: none;
+  }
+  .search-count {
+    font-size: 12px;
+    color: #888;
+    padding: 4px 4px 8px;
+  }
+  .search-empty {
+    padding: 16px;
+    text-align: center;
+    font-size: 13px;
+    color: #888;
+    background: #ffffff;
+    border: 1px solid #e8e6df;
+    border-radius: 10px;
+  }
+  .search-item {
+    background: #ffffff;
+    border: 1px solid #e8e6df;
+    border-radius: 10px;
+    padding: 11px 13px;
+    margin-bottom: 6px;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.1s;
+  }
+  .search-item:active {
+    transform: scale(0.99);
+    background: #f5f5f0;
+  }
+  .search-item-meta {
+    font-size: 11px;
+    color: #888;
+    margin-bottom: 3px;
+  }
+  .search-item-stem {
+    font-size: 13px;
+    line-height: 1.55;
+    color: #1f1f1d;
+    word-break: break-word;
+  }
+  mark {
+    background: #faeeda;
+    color: #854f0b;
+    padding: 0 2px;
+    border-radius: 2px;
+  }
+  .badge {
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 999px;
+  }
+  .badge-ok {
+    background: #e1f5ee;
+    color: #085041;
+  }
+  .badge-no {
+    background: #fcebeb;
+    color: #791f1f;
+  }
+  .mode-card {
+    background: #ffffff;
+    border: 1px solid #e8e6df;
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.1s;
+    user-select: none;
+  }
+  .mode-card:active { transform: scale(0.98); background: #f5f5f0; }
+  .mode-card.disabled { opacity: 0.45; pointer-events: none; }
+  .mode-card-static {
+    background: #ffffff;
+    border: 1px solid #e8e6df;
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 10px;
+    user-select: none;
+  }
+  .count-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 12px;
+    flex-wrap: wrap;
+  }
+  .count-label {
+    font-size: 13px;
+    color: #888;
+  }
+  .count-pills {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    flex: 1;
+  }
+  .count-pill {
+    padding: 6px 12px;
+    background: #f5f5f0;
+    border: 1px solid #e8e6df;
+    border-radius: 999px;
+    font-size: 13px;
+    color: #555;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.15s;
+  }
+  .count-pill:active { transform: scale(0.95); }
+  .count-pill.active {
+    background: #1f1f1d;
+    color: #ffffff;
+    border-color: #1f1f1d;
+  }
+  .mode-title {
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+  .mode-desc {
+    font-size: 13px;
+    color: #888;
+  }
+  .meta-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    font-size: 12px;
+    color: #888;
+  }
+  .progress-bar {
+    height: 4px;
+    background: #e8e6df;
+    border-radius: 2px;
+    overflow: hidden;
+    margin-bottom: 14px;
+  }
+  .progress-fill {
+    height: 100%;
+    background: #185fa5;
+    transition: width 0.3s;
+  }
+  .q-card {
+    background: #ffffff;
+    border: 1px solid #e8e6df;
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 16px;
+  }
+  .q-stem {
+    font-size: 15px;
+    line-height: 1.75;
+    margin-bottom: 14px;
+    word-break: break-word;
+  }
+  .opt {
+    display: block;
+    width: 100%;
+    text-align: left;
+    padding: 12px 14px;
+    margin-bottom: 8px;
+    background: #ffffff;
+    border: 1px solid #e8e6df;
+    border-radius: 10px;
+    font-size: 14px;
+    line-height: 1.6;
+    color: #1f1f1d;
+    font-family: inherit;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.1s;
+    word-break: break-word;
+  }
+  .opt:active:not(:disabled) { transform: scale(0.98); }
+  .opt:disabled { cursor: default; }
+  .opt.correct {
+    background: #e1f5ee;
+    border-color: #1d9e75;
+    color: #085041;
+  }
+  .opt.wrong {
+    background: #fcebeb;
+    border-color: #e24b4a;
+    color: #791f1f;
+  }
+  .opt-key {
+    display: inline-block;
+    width: 22px;
+    font-weight: 600;
+  }
+  .explain {
+    margin-top: 14px;
+    padding: 14px;
+    background: #f5f5f0;
+    border-radius: 10px;
+    font-size: 13px;
+    line-height: 1.75;
+    color: #555;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+  .explain b {
+    color: #1f1f1d;
+    font-weight: 600;
+    display: block;
+    margin-bottom: 6px;
+  }
+  .btn-primary {
+    width: 100%;
+    padding: 13px;
+    background: #1f1f1d;
+    color: #ffffff;
+    border: none;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 500;
+    font-family: inherit;
+    cursor: pointer;
+    margin-top: 14px;
+    transition: opacity 0.15s, transform 0.1s;
+  }
+  .btn-primary:active { transform: scale(0.98); opacity: 0.85; }
+  .btn-secondary {
+    width: 100%;
+    padding: 11px;
+    background: transparent;
+    color: #888;
+    border: 1px solid #e8e6df;
+    border-radius: 10px;
+    font-size: 13px;
+    font-family: inherit;
+    cursor: pointer;
+    margin-top: 16px;
+  }
+  .btn-back {
+    background: transparent;
+    border: none;
+    padding: 8px 0;
+    font-size: 14px;
+    color: #888;
+    cursor: pointer;
+    font-family: inherit;
+    margin-bottom: 6px;
+  }
+  .complete {
+    text-align: center;
+    padding: 32px 0;
+  }
+  .complete-title {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 16px;
+  }
+  @media (prefers-color-scheme: dark) {
+    body { background: #1a1a18; color: #f0efe9; }
+    .stat-card, .mode-card, .q-card, .mode-card-static { background: #28272a; border-color: #3a3936; }
+    .exam-tab { background: #28272a; border-color: #3a3936; color: #999; }
+    .exam-tab.active { background: #378add; color: #ffffff; border-color: #378add; }
+    .search-input { background: #28272a; border-color: #3a3936; color: #f0efe9; }
+    .search-input:focus { border-color: #378add; }
+    .search-item { background: #28272a; border-color: #3a3936; }
+    .search-item:active { background: #1a1a18; }
+    .search-item-stem { color: #f0efe9; }
+    .search-empty { background: #28272a; border-color: #3a3936; }
+    mark { background: #633806; color: #fac775; }
+    .badge-ok { background: #04342c; color: #9fe1cb; }
+    .badge-no { background: #501313; color: #f7c1c1; }
+    .count-pill { background: #1a1a18; border-color: #3a3936; color: #b5b3ac; }
+    .count-pill.active { background: #f0efe9; color: #1a1a18; border-color: #f0efe9; }
+    .stat-num { color: #f0efe9; }
+    .stat-label, .mode-desc, .meta-row, .btn-back, .btn-secondary { color: #999; }
+    .progress-bar { background: #3a3936; }
+    .opt { background: #28272a; border-color: #3a3936; color: #f0efe9; }
+    .opt.correct { background: #04342c; border-color: #1d9e75; color: #9fe1cb; }
+    .opt.wrong { background: #501313; border-color: #e24b4a; color: #f7c1c1; }
+    .explain { background: #1a1a18; color: #b5b3ac; }
+    .explain b { color: #f0efe9; }
+    .btn-primary { background: #f0efe9; color: #1a1a18; }
+    .mode-card:active { background: #1a1a18; }
+    .btn-secondary { border-color: #3a3936; }
+  }
+
+body {max-width:680px; padding:24px 20px 36px;}
+button, input, textarea {font:inherit;}
+button:focus-visible, a:focus-visible, summary:focus-visible {outline:3px solid #378add;outline-offset:4px;}
+.site-header {padding:12px 0 20px;}
+.site-header h1 {font-size:28px;letter-spacing:-.5px;margin:8px 0;}
+.site-header p {color:#73736e;font-size:13px;margin:0;line-height:1.8;}
+.eyebrow {font-size:10px;letter-spacing:2px;color:#185fa5;font-weight:700;}
+.stats-help {font-size:11px;color:#777;margin:-5px 0 20px;}
+.full {width:100%;text-align:left;display:block;color:inherit;font:inherit;}
+.mode-title,.mode-desc,.search-item-meta,.search-item-stem {display:block;}
+.mode-card:disabled {opacity:.48;cursor:default;transform:none;}
+.search-item {width:100%;text-align:left;font-family:inherit;}
+#results {margin-top:12px;}
+.badge {background:#ecebe5;color:#666;}
+.resume-card {display:flex;align-items:center;justify-content:space-between;gap:12px;border:1px solid #b8cee0;background:#edf4fb;padding:14px;border-radius:12px;margin:0 0 18px;font-size:12px;}
+.btn-small {background:#185fa5;color:white;border:0;border-radius:8px;padding:9px 12px;cursor:pointer;white-space:nowrap;}
+.q-stem {font-size:17px;line-height:1.9;}
+.meta-row {gap:10px;flex-wrap:wrap;}
+.tf-options {display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.tf-options .opt {min-height:84px;margin:0;display:flex;align-items:center;gap:10px;justify-content:center;flex-wrap:wrap;}
+.answer-key {font-size:23px;font-weight:600;}
+.source-note {border-left:3px solid #c28a26;background:#fff6e3;padding:12px 14px;margin:14px 0 0;font-size:12px;line-height:1.8;color:#75531b;border-radius:0 8px 8px 0;}
+.table-figure {margin:0 0 18px;}
+.table-figure img {display:block;width:100%;height:auto;border:1px solid #ddd;border-radius:5px;}
+figcaption {font-size:11px;color:#777;line-height:1.7;margin-top:6px;}
+.table-zoom {border:0;background:none;color:#185fa5;padding:4px 0;cursor:pointer;text-decoration:underline;}
+dialog {max-width:96vw;width:1000px;border:1px solid #999;border-radius:12px;padding:16px;background:#fff;color:#222;}
+dialog::backdrop {background:#0009;}
+.zoom-scroll {overflow:auto;margin-top:12px;}
+.zoom-scroll img {width:1000px;max-width:none;height:auto;display:block;}
+a {color:#185fa5;}
+textarea {width:100%;display:block;margin:8px 0;padding:12px;border:1px solid #d9d8d0;border-radius:9px;background:#fafaf7;color:inherit;resize:vertical;line-height:1.8;}
+.draft-label {font-size:13px;font-weight:600;}
+.muted {color:#777;font-size:13px;line-height:1.8;}
+.self-help {font-size:13px;}
+.self-actions {display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.self-actions button {margin-top:0;}
+.formula {font-weight:600;color:#185fa5;background:#edf4fb;border-radius:8px;padding:12px;overflow-wrap:anywhere;}
+.q-card h2 {margin-top:0;}
+.about {font-size:12px;color:#777;line-height:1.8;margin:24px 0 12px;}
+.about summary {cursor:pointer;}
+footer {text-align:center;color:#92918a;font-size:11px;line-height:2;margin-top:30px;}
+.sr-only {position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;}
+@media(max-width:400px){body{padding:16px 14px;}.q-stem{font-size:16px;}.tf-options .opt{font-size:13px;}.resume-card{align-items:flex-start;}.meta-row{font-size:11px;}}
+@media(prefers-color-scheme:dark){.site-header p,.muted,.stats-help,.about,figcaption{color:#aaa;}.eyebrow,a{color:#8ac5ff;}.source-note{background:#392b16;color:#f1d29a;}.resume-card,.formula{background:#172d40;color:#b9dcff;border-color:#315573;}.badge{background:#44423b;color:#ddd;}textarea{background:#1a1a18;border-color:#444;}.full{color:#eee;}}
+
+.options .opt{display:flex;align-items:baseline;gap:6px;}
+.options .opt-key{flex:0 0 22px;}
+.scratch{margin:0 0 18px;font-size:13px;}
+.scratch summary{cursor:pointer;color:#185fa5;padding:8px 0;}
+.q-stem{font-size:16px;}
+.site-header h1{font-size:27px;}
+.site-header{padding-top:8px;}
+.stat-label{color:#777;}
+.mode-card{line-height:1.6;}
+.formula{font-size:15px;}
+.complete .stat-grid{margin-top:25px;}
+.explain{white-space:normal;}
+@media(prefers-color-scheme:dark){.scratch summary{color:#8ac5ff;}.stat-label{color:#aaa;}}
+</style></head><body><main id="app"></main><noscript>請啟用 JavaScript 以使用國際專案管理刷題工具。</noscript><script>
+const TOPICS={"1": "認證、組織與專案角色", "2": "發起、可行性與治理", "3": "目標、範圍與 WBS", "4": "時程、網路圖與 PERT", "5": "資源、團隊與領導", "6": "成本、財務與投資評估", "7": "採購合約與酬金"};
+const QUESTIONS=[{"id": "choice-1", "type": "choice", "n": 1, "row": 3, "ch": 1, "stem": "具備管理複雜度較高的專案管理成功經驗者，可以申請IPMA 哪一等級的證照?", "opts": ["A 級", "B級", "C級", "D 級"], "ans": 1, "exp": "依來源答案，具備管理複雜專案的成功經驗，對應 IPMA B 級；可記為資深專案經理層級。", "note": ""}, {"id": "choice-2", "type": "choice", "n": 2, "row": 4, "ch": 1, "stem": "利害關係人分析對影響力大但關心程度低者，稱為第幾類關係人?", "opts": ["第一類", "第二類", "第三類", "第四類"], "ans": 1, "exp": "題庫將「高影響力、低關心程度」編為第二類。複習時把影響力與關心程度分開判斷。", "note": "第一、第二類等編號會隨教材的象限排序改變，請依本課程分類記憶；本工具按原檔標準答案 B 計分。"}, {"id": "choice-3", "type": "choice", "n": 3, "row": 5, "ch": 1, "stem": "專案在管理人事時地物的困難程度，稱為專案管理的?", "opts": ["複雜度", "困難度", "混亂度", "挑戰度"], "ans": 0, "exp": "人、事、時、地、物之間的管理難度與相互關係，構成專案管理的複雜度。", "note": ""}, {"id": "choice-4", "type": "choice", "n": 4, "row": 6, "ch": 1, "stem": "下面何者不是IPMA專案管理複雜度的十個構面之一?", "opts": ["專案目的與結果評估", "專案關係人整合", "文化和社會背景", "成員努力程度"], "ans": 3, "exp": "本題為否定題：來源以「成員努力程度」為不屬於十構面的選項。", "note": ""}, {"id": "choice-5", "type": "choice", "n": 5, "row": 7, "ch": 1, "stem": "下面何者不是IPMA專案管理複雜度的十個構面之一?", "opts": ["專案結構與協調需求", "專案組織", "成功的機會", "資源"], "ans": 2, "exp": "來源將結構協調、組織與資源列入複雜度構面，「成功的機會」不是本題所列構面。", "note": ""}, {"id": "choice-6", "type": "choice", "n": 6, "row": 8, "ch": 1, "stem": "若團隊成員所屬部門主管的權利弱於矩陣組織的專案經理權力，則此矩陣組織稱為?", "opts": ["強矩陣", "平衡矩陣", "弱矩陣", "功能型矩陣"], "ans": 0, "exp": "專案經理權力強於部門主管時，屬強矩陣；相近為平衡矩陣，較弱為弱矩陣。", "note": ""}, {"id": "choice-7", "type": "choice", "n": 7, "row": 9, "ch": 1, "stem": "下列何種組織的團隊成員，工作位置比較可能是在原部門?", "opts": ["弱矩陣", "強矩陣", "平衡矩陣", "專案型"], "ans": 0, "exp": "弱矩陣較接近功能型組織，成員較可能留在原部門工作。", "note": ""}, {"id": "choice-8", "type": "choice", "n": 8, "row": 10, "ch": 1, "stem": "對專案提供財務支援，並且接收專案成果的人，稱為?", "opts": ["發起人", "專案擁有人", "顧客", "指導委員"], "ans": 1, "exp": "依本題用語，提供財務支援並接收成果者為專案擁有人，注意與發起人的分工。", "note": ""}, {"id": "choice-9", "type": "choice", "n": 9, "row": 11, "ch": 1, "stem": "由組織或專案擁有人指派，簽署專案授權，協助與監督專案的執行的人，稱為?", "opts": ["專案擁有人", "指導委員", "專案經理", "發起人"], "ans": 3, "exp": "依來源定義，發起人負責簽署授權，並協助與監督專案執行。", "note": ""}, {"id": "choice-10", "type": "choice", "n": 10, "row": 12, "ch": 1, "stem": "下面何者不是PMO 的主要職責?", "opts": ["專案管理方法的導入", "專案資源的跨部整合", "專案執行績效監督", "專案的組合管理業務"], "ans": 2, "exp": "依來源分類，PMO 側重方法、資源整合與組合管理；此題排除「專案執行績效監督」。", "note": "PMO 的實際職責會依組織授權而不同，也可能監督專案績效。本題依 Excel 標準答案 C 計分。"}, {"id": "choice-11", "type": "choice", "n": 11, "row": 13, "ch": 1, "stem": "下面何者不是PMO 的主要職責?", "opts": ["專案行政業務", "專案的變更管理", "專案管理的職能訓練", "專案最佳實務的留存"], "ans": 1, "exp": "依來源分類，行政、訓練與最佳實務留存屬 PMO 工作，此題排除「專案的變更管理」。", "note": "PMO 也可能參與變更管理，本題屬來源教材的角色分工，保留標準答案 B。"}, {"id": "choice-12", "type": "choice", "n": 12, "row": 14, "ch": 1, "stem": "下列何者不是專案建議書主要的內容大綱?", "opts": ["專案範圍與交付成果", "專案需求與目標", "專案可行性", "專案組織"], "ans": 2, "exp": "依題庫的大綱分類，範圍、需求與組織屬建議書內容，本題排除「專案可行性」。", "note": "建議書內容可因模板而異，也可能包含可行性論證；本題依來源答案 C 複習。"}, {"id": "choice-13", "type": "choice", "n": 13, "row": 15, "ch": 1, "stem": "專案擁有人可以使用何種文件來正式徵求外部團隊提供專案建議書?", "opts": ["SOW", "RFP", "RFQ", "QFR"], "ans": 1, "exp": "RFP（Request for Proposal）用來徵求建議書；RFQ 側重報價，SOW 為工作說明。", "note": ""}, {"id": "choice-14", "type": "choice", "n": 14, "row": 16, "ch": 1, "stem": "有關專案管理的最佳實務之描述，何者有錯？", "opts": ["變更最少的作法", "進度最快的作法", "風險最低的作法", "成本最省的作法"], "ans": 0, "exp": "本題問錯誤描述，來源答案為「變更最少」。變更數量少不必然代表管理方法適合。", "note": ""}, {"id": "choice-15", "type": "choice", "n": 15, "row": 17, "ch": 2, "stem": "當企業選擇一個專案的技術方案時，最重要的標準是根據？", "opts": ["創新性", "實際可行", "性能好", "易於使用"], "ans": 1, "exp": "技術方案首先須實際可行；只有創新或性能優越，仍可能無法落實。", "note": ""}, {"id": "choice-16", "type": "choice", "n": 16, "row": 18, "ch": 2, "stem": "專案環境評估報告必須經過市政府核准，但是時間長短無法控制，這是？", "opts": ["專案溝通議題", "專案外部相依事件", "專案限制", "專案里程碑"], "ans": 1, "exp": "政府核准是專案團隊外部的審查事件，後續工作須等待它，因此屬外部相依。", "note": ""}, {"id": "choice-17", "type": "choice", "n": 17, "row": 19, "ch": 2, "stem": "到印尼成立半導體工廠，但是找不到足夠數量的技術人員，這是？", "opts": ["專案的文化環境", "專案的社會環境", "專案的產業環境", "專案的外交環境"], "ans": 1, "exp": "依來源分類，當地技術人員數量不足屬社會環境的人力條件。", "note": ""}, {"id": "choice-18", "type": "choice", "n": 18, "row": 20, "ch": 2, "stem": "專案可行性分析所需的效益資料通常不包括下列何者？", "opts": ["品質提升效益", "財務收入的效益", "整體產業提升的效益", "顧客滿意的效益"], "ans": 2, "exp": "題庫將品質、收入與顧客滿意列為主要效益資料，本題排除「整體產業提升」。", "note": ""}, {"id": "choice-19", "type": "choice", "n": 19, "row": 21, "ch": 2, "stem": "專案可行性分析主要是在釐清？", "opts": ["專案的限制", "可能的選項", "相關的假設", "以上皆是"], "ans": 3, "exp": "可行性分析需一起檢視限制、替代選項與假設，因此選以上皆是。", "note": ""}, {"id": "choice-20", "type": "choice", "n": 20, "row": 22, "ch": 2, "stem": "公共設施專案的可行性分析中，下列何者比較不被考慮？", "opts": ["安全可行性", "社會可行性", "技術可行性", "經濟可行性"], "ans": 3, "exp": "依來源答案，公共設施相較其他列出的因素，較不以「經濟可行性」為本題重點。", "note": "公共建設也應評估經濟與社會效益，不能將本題解讀為經濟可行性不重要；此處依 Excel 答案 D 計分。"}, {"id": "choice-21", "type": "choice", "n": 21, "row": 23, "ch": 2, "stem": "研發專案失敗，結案報告顯示高估了供應商新材料研發能力是主要關鍵，這表示以下何者在發起階段沒有做好？", "opts": ["管理可行性", "技術可行性", "環境可行性", "市場可行性"], "ans": 1, "exp": "供應商研發能力是技術能否實現的重要條件，應在技術可行性中評估。", "note": ""}, {"id": "choice-22", "type": "choice", "n": 22, "row": 24, "ch": 2, "stem": "專案可行性分析報告內容主要是針對何人撰寫？", "opts": ["發起人", "專案擁有人", "公司主管", "專案組合管理者"], "ans": 2, "exp": "可行性報告支持公司主管進行決策，依來源答案以公司主管為主要讀者。", "note": ""}, {"id": "choice-23", "type": "choice", "n": 23, "row": 25, "ch": 6, "stem": "現值是？", "opts": ["營運資本的稅後值", "截止到今天為止的總預算", "未來現金流量的現在價值", "現在現金流量的未來價值"], "ans": 2, "exp": "現值把未來現金流量折算為現在時點的價值，勿與未來值混淆。", "note": ""}, {"id": "choice-24", "type": "choice", "n": 24, "row": 26, "ch": 6, "stem": "回收年限是？", "opts": ["折現收入與折現成本之比", "專案被預期最快獲得盈利的時間", "現在投資的未來價值", "成本超過利潤的時間點"], "ans": 1, "exp": "來源選 B。較精確的記法：回收年限是累積淨現金流回收原始投資所需的時間。", "note": "回收年限指回收初始投資的時間，不等同於會計上開始獲利的時間；來源 B 的用語較不精確。"}, {"id": "choice-25", "type": "choice", "n": 25, "row": 27, "ch": 6, "stem": "進行財務可行性分析時，下列何者不是主要輸入資料？", "opts": ["成本資料", "效益資料", "政府經濟預測報告", "組織情境資料"], "ans": 2, "exp": "依來源答案，成本、效益、組織情境是本題主要輸入，排除政府經濟預測報告。", "note": ""}, {"id": "choice-26", "type": "choice", "n": 26, "row": 28, "ch": 6, "stem": "以下何者正確？", "opts": ["淨現值是指未來資金的現在價值", "內部報酬率是指淨現值最小時的利率", "回收年限是指內部報酬率最大時的年數", "以上皆非"], "ans": 0, "exp": "來源選 A。計算 NPV 時應加總各期淨現金流的折現值，並扣除初始投資。", "note": "A 的敘述省略了淨現值需扣除初始投資等淨額概念；IRR 則是令 NPV = 0 的折現率，並非令 NPV 最小。原檔答案仍為 A。"}, {"id": "choice-27", "type": "choice", "n": 27, "row": 29, "ch": 6, "stem": "下面何者不是選擇專案的財務分析方法？", "opts": ["淨現值", "經濟附加值", "回收年限", "外部報酬率"], "ans": 1, "exp": "依題庫分類，本題排除經濟附加值；其餘列為專案選擇的財務分析方式。", "note": ""}, {"id": "choice-28", "type": "choice", "n": 28, "row": 30, "ch": 6, "stem": "下列方法何者可提高財務可行性分析的精確性？", "opts": ["參考文獻", "經驗", "預測資料", "以上皆是"], "ans": 3, "exp": "文獻、經驗與預測資料可互相補充，有助於提高分析品質，因此選以上皆是。", "note": ""}, {"id": "choice-29", "type": "choice", "n": 29, "row": 31, "ch": 6, "stem": "進行財務可行性分析時，淨現值法的成本資料使用公司顧問所提供的數學公式計算得到，稱為？", "opts": ["由下往上法", "類比法", "參數法", "以上皆非"], "ans": 2, "exp": "用數學公式與參數估計成本，屬參數法；以相似舊案比較則是類比法。", "note": ""}, {"id": "choice-30", "type": "choice", "n": 30, "row": 32, "ch": 2, "stem": "專案關係人意見不同時，應該以何者為主？", "opts": ["發起人", "高層", "第一線成員", "客戶"], "ans": 3, "exp": "依來源答案，關係人意見不同時以客戶為本題優先對象。", "note": "不同關係人的意見應依治理與核准的決策程序整合，並非所有情況都單由客戶決定；本題保留來源 D。"}, {"id": "choice-31", "type": "choice", "n": 31, "row": 33, "ch": 2, "stem": "下列何者是在發起階段結束和規劃階段開始前所發出的文件？", "opts": ["可行性分析報告", "專案授權書", "產品說明書", "專案概念書"], "ans": 1, "exp": "專案授權書在題庫的發起與規劃階段之間提供正式授權。", "note": ""}, {"id": "choice-32", "type": "choice", "n": 32, "row": 34, "ch": 2, "stem": "專案授權書應？", "opts": ["細化專案可交付成果", "討論專案的風險和限制", "指定專案的組織形式", "說明專案經理的責任和權利"], "ans": 3, "exp": "授權書的重要功能是說明專案經理的責任與權限；詳細工作另在後續規劃展開。", "note": ""}, {"id": "choice-33", "type": "choice", "n": 33, "row": 35, "ch": 2, "stem": "專案授權書中通常不包括？", "opts": ["專案目標", "專案風險", "專案里程碑", "專案資源"], "ans": 1, "exp": "依來源答案，本題排除專案風險，保留目標、里程碑與資源。", "note": "常見授權書也會列高層次風險。本題依提供的 Excel 標準答案 B 計分，不宜推論所有授權書都不含風險。"}, {"id": "choice-34", "type": "choice", "n": 34, "row": 36, "ch": 2, "stem": "專案授權書發出之前，下列何種文件應該要加以評估及獲得核准？", "opts": ["專案招募計畫書", "採購計劃書", "專案品管計劃", "專案建議書"], "ans": 3, "exp": "授權書發出前，應先評估並核准專案建議書，確認專案值得啟動。", "note": ""}, {"id": "choice-35", "type": "choice", "n": 35, "row": 37, "ch": 2, "stem": "如果專案的最後可交付成果驗收通過，則專案由執行階段進入？", "opts": ["發起階段", "規劃階段", "監控階段", "結束階段"], "ans": 3, "exp": "最後交付成果驗收通過後，進入結束階段，仍需完成結案相關工作。", "note": ""}, {"id": "choice-36", "type": "choice", "n": 36, "row": 38, "ch": 2, "stem": "專案管理可以應用到？", "opts": ["變革管理", "創新管理", "問題解決", "以上皆是"], "ans": 3, "exp": "專案管理可用於變革、創新及問題解決，故選以上皆是。", "note": ""}, {"id": "choice-37", "type": "choice", "n": 37, "row": 39, "ch": 2, "stem": "何者不是專案的主要關鍵成功因素？", "opts": ["目標明確", "人員技術高超", "計畫可行", "高階主管支持"], "ans": 1, "exp": "本題問「不是主要關鍵成功因素」，來源排除人員技術高超；目標、計畫與高層支持為重點。", "note": ""}, {"id": "choice-38", "type": "choice", "n": 38, "row": 40, "ch": 2, "stem": "指派專案經理的最佳時機是在？", "opts": ["發起階段", "規劃階段", "執行階段", "以上皆是"], "ans": 0, "exp": "越早指派專案經理，越能參與需求與整體規劃；題庫答案為發起階段。", "note": ""}, {"id": "choice-39", "type": "choice", "n": 39, "row": 41, "ch": 2, "stem": "政府召集相關單位共同推動節能減碳專案，以省電 5%為年度目標，請問這是？", "opts": ["專案組合管理", "專案管理", "大型專案管理", "專案變革管理"], "ans": 2, "exp": "依來源用語，多單位共同推動、具有整體目標的情境歸為大型專案管理。", "note": ""}, {"id": "choice-40", "type": "choice", "n": 40, "row": 42, "ch": 2, "stem": "專案組合管理作業流程不包括下列何者？", "opts": ["專案規劃", "策略校準", "專案排名", "專案核准"], "ans": 0, "exp": "組合管理重視策略校準、排名與核准；個別專案規劃屬不同層次。", "note": ""}, {"id": "choice-41", "type": "choice", "n": 41, "row": 43, "ch": 2, "stem": "組織變革專案的總時間會受下列何者影響最小？", "opts": ["領導變革的人選", "啟動變革的層級", "變革的幅度", "公司的規模"], "ans": 3, "exp": "依來源答案，本題四個因素中以公司規模對變革總時間影響最小。", "note": ""}, {"id": "choice-42", "type": "choice", "n": 42, "row": 44, "ch": 2, "stem": "專案在哪個階段可以比較準確估計時間和成本？", "opts": ["發起", "規劃", "執行", "控制"], "ans": 2, "exp": "專案執行後可取得更多實際資訊，因此相較早期，時間與成本估計通常更明確。", "note": ""}, {"id": "choice-43", "type": "choice", "n": 43, "row": 45, "ch": 2, "stem": "專案經過評估可行，由高層指定的專案發起人草擬授權書，再交付給指派的專案經理後，專案進入以下哪一個階段？", "opts": ["發起階段", "規劃階段", "執行階段", "控制階段"], "ans": 1, "exp": "題庫將授權書交付經理後的下一階段視為規劃階段。", "note": ""}, {"id": "choice-44", "type": "choice", "n": 44, "row": 46, "ch": 2, "stem": "專案式管理是指？", "opts": ["以專案方式管理例行性事務", "以專案方式管理非例行事務", "以專案方式管理獨特性事務", "以專案方式管理短暫性事務"], "ans": 0, "exp": "依來源用語，「專案式管理」是以專案方式處理例行性事務，須與一般專案特性區分。", "note": "題庫區分「專案式管理」與一般專案的非例行、獨特特性。本題保留來源 A，依課程用語複習。"}, {"id": "choice-45", "type": "choice", "n": 45, "row": 47, "ch": 1, "stem": "確保組織內部建立有標準的專案管理制度是下列何者的主要職責？", "opts": ["專案經理", "專案團隊", "組織管理高層", "以上皆是"], "ans": 2, "exp": "建立組織層級標準制度需要高層支持與權限，來源答案為組織管理高層。", "note": ""}, {"id": "choice-46", "type": "choice", "n": 46, "row": 48, "ch": 1, "stem": "組織專案管理系統和制度的順暢與否稱為？", "opts": ["專案管理架構成熟度", "專案管理流程成熟度", "組織專案管理成熟度", "專案資訊化成熟度"], "ans": 2, "exp": "整個組織專案制度與系統的成熟程度，稱為組織專案管理成熟度。", "note": ""}, {"id": "choice-47", "type": "choice", "n": 47, "row": 49, "ch": 1, "stem": "定義全組織性的專案管理政策，並確保這些政策被所有專案落實執行是下列何者的職權？", "opts": ["專案辦公室", "專案發起人", "專案指導委員會", "專案經理"], "ans": 2, "exp": "依來源角色分工，組織層級政策及其落實屬專案指導委員會職權。", "note": ""}, {"id": "choice-48", "type": "choice", "n": 48, "row": 50, "ch": 1, "stem": "大型專案分解為數個一般專案的過程中，特別要注意下列何者？", "opts": ["資源分解", "目標分解", "預算分解", "工作包分解"], "ans": 1, "exp": "大型專案拆成多個一般專案時，須確保子專案目標與整體目標一致。", "note": ""}, {"id": "choice-49", "type": "choice", "n": 49, "row": 51, "ch": 1, "stem": "進行專案組合管理的專案排名，主要是依據專案的？", "opts": ["可靠度、急迫性", "貢獻度、急迫性", "貢獻度、可靠性", "資源耗用度、可靠度"], "ans": 1, "exp": "專案排名需評估對組織的貢獻程度及急迫性，不只看能否完成。", "note": ""}, {"id": "choice-50", "type": "choice", "n": 50, "row": 52, "ch": 1, "stem": "下列何者不屬於專案的總體環境？", "opts": ["外包商", "產業", "生態", "文化"], "ans": 0, "exp": "產業、生態、文化屬總體環境；外包商較接近專案直接互動的對象。", "note": ""}, {"id": "choice-51", "type": "choice", "n": 51, "row": 53, "ch": 1, "stem": "能使專案團隊和所有專案關係人，在相同的遊戲規則下執行專案的是專案？", "opts": ["資訊平台", "管理制度", "顧客需求", "專案授權書"], "ans": 1, "exp": "管理制度建立共同規則，讓專案團隊與關係人有一致的工作依據。", "note": ""}, {"id": "choice-52", "type": "choice", "n": 52, "row": 54, "ch": 1, "stem": "透過下列何者，可以把專案方法和技巧保留下來，然後經由專案實務社群的分享，全面提升組織專案人員的管理能力？", "opts": ["專案制度", "專案會議記錄", "專案管理資訊系統", "專案管理知識庫"], "ans": 3, "exp": "方法、技巧與經驗可存入專案管理知識庫，再透過社群分享。", "note": ""}, {"id": "choice-53", "type": "choice", "n": 53, "row": 55, "ch": 1, "stem": "專案計畫書要經過何者審核通過？", "opts": ["專案稽核員", "專案發起人", "專案客戶", "以上皆非"], "ans": 1, "exp": "依來源的治理分工，專案計畫書須由專案發起人審核。", "note": ""}, {"id": "choice-54", "type": "choice", "n": 54, "row": 56, "ch": 1, "stem": "內部專案的需求表達是誰的責任？", "opts": ["部門經理", "專案發起人", "組織高層", "以上皆可"], "ans": 3, "exp": "內部專案需求可能來自部門、發起人或高層，因此來源選以上皆可。", "note": ""}, {"id": "choice-55", "type": "choice", "n": 55, "row": 57, "ch": 1, "stem": "專案生命週期成本估計所考慮的是？", "opts": ["客戶接收時的專案成本", "預期利潤", "所有成本，包括設計、設置、運作和處置成本", "用於發起、規劃、執行、控制和結束階段的專案成本"], "ans": 3, "exp": "來源標準答案為 D，將成本對應到發起、規劃、執行、控制、結束等專案階段。", "note": "來源答案 D 與常見生命週期成本定義有差異。若指產品完整生命週期，通常也包含運作與處置成本（對應選項 C）；本工具依 Excel 的 D 計分，建議向授課教師確認。"}, {"id": "choice-56", "type": "choice", "n": 56, "row": 58, "ch": 1, "stem": "管理多個專案時會產生一些困難，這是由於？", "opts": ["專案經理的權力有限", "專案團隊將注意力聚焦在他們的部門專業而不是專案上", "不同專案的相對優先順序與有限資源競爭所產生的衝突", "人們按專業領域而不是一個支持專案的團隊來劃分"], "ans": 2, "exp": "多專案會競爭有限資源，且相對優先順序不同，容易形成衝突。", "note": ""}, {"id": "choice-57", "type": "choice", "n": 57, "row": 59, "ch": 1, "stem": "甲旅行社接受某公司客戶委託發起歐洲15日旅遊專案，在概念書撰寫會議中，下列何者不是優先的參加對象？", "opts": ["客戶代表", "顧客關係管理人員", "領隊", "導遊"], "ans": 3, "exp": "依來源答案，旅遊專案概念形成時，相較客戶、顧客關係人員與領隊，導遊較非優先參與者。", "note": ""}, {"id": "choice-58", "type": "choice", "n": 58, "row": 60, "ch": 1, "stem": "一套電腦化的專案管理軟體系統，可以協助專案的規劃、執行和控制的是？", "opts": ["專案管理資訊系統", "專案管理知識庫", "專案資源", "以上皆非"], "ans": 0, "exp": "PMIS 即專案管理資訊系統，可支援規劃、執行與控制。", "note": ""}, {"id": "choice-59", "type": "choice", "n": 59, "row": 61, "ch": 3, "stem": "和專案進度、成本、品質、範圍有關的目標，稱為專案的何種目標？", "opts": ["彈性目標", "隱性目標", "軟性目標", "硬性目標"], "ans": 3, "exp": "進度、成本、品質、範圍等可具體檢視的目標，題庫稱為硬性目標。", "note": ""}, {"id": "choice-60", "type": "choice", "n": 60, "row": 62, "ch": 3, "stem": "對於制定一個好的專案目標，下列描述何者有誤？", "opts": ["專案目標可以衡量並且可以驗證", "專案目標具挑戰性但是也很實際", "負責規劃專案目標的人被足夠的授權", "可達成"], "ans": 2, "exp": "本題問目標本身的描述；「規劃者被足夠授權」是人員權限條件，不是目標的特性。", "note": ""}, {"id": "choice-61", "type": "choice", "n": 61, "row": 63, "ch": 3, "stem": "目標管理制度要達到？", "opts": ["建立明確的、現實的目標", "定期評估專案目標是否已經達到", "促進成員對專案的參與和團隊建立", "以上皆是"], "ans": 3, "exp": "目標管理包括設定明確目標、定期評估及促進參與，三者皆適用。", "note": ""}, {"id": "choice-62", "type": "choice", "n": 62, "row": 64, "ch": 3, "stem": "專案是使用\"目標管理\"的理想場合，其最主要原因為？", "opts": ["專案經理的責任以專案目的和專案目標為導向", "專案通常在一個矩陣管理環境中運作", "專案經理的責任以公司的年度目標為依據", "專案管理涉及到組織目標的確定"], "ans": 0, "exp": "專案經理的責任直接以專案目的與目標為導向，因此適合使用目標管理。", "note": ""}, {"id": "choice-63", "type": "choice", "n": 63, "row": 65, "ch": 3, "stem": "發起人審查專案計畫的目的是在進行以下哪一個工作？", "opts": ["專案的目標管理", "目標的專案管理", "專案的整合管理", "專案可行性管理"], "ans": 0, "exp": "依題庫，發起人審查計畫是在確認專案目標能否被實現。", "note": ""}, {"id": "choice-64", "type": "choice", "n": 64, "row": 66, "ch": 3, "stem": "何者是專案的目標、授權等級、角色及責任的簽署文件？", "opts": ["範圍說明書", "責任指派矩陣", "專案人事派令", "專案授權書"], "ans": 3, "exp": "專案授權書正式記錄目標、授權程度、角色與責任。", "note": ""}, {"id": "choice-65", "type": "choice", "n": 65, "row": 67, "ch": 3, "stem": "專案目標？", "opts": ["都不能變更", "都可以變更", "不重要目標可以變更，重要目標不能變更", "重要目標可以變更，不重要目標不能變更"], "ans": 1, "exp": "目標可依正式程序變更；「可變更」不等於可以任意改動而不評估影響。", "note": "目標變更需經正式審核、評估成本／時程等影響，並更新基準，不表示可以任意變更。"}, {"id": "choice-66", "type": "choice", "n": 66, "row": 68, "ch": 3, "stem": "專案範圍就是指？", "opts": ["所有預算的總和", "所有工作包的總和", "所有允收成果的總和", "所有資源的總和"], "ans": 1, "exp": "題庫將專案範圍視為所有工作包的總和，重點是涵蓋完成專案所需的工作。", "note": ""}, {"id": "choice-67", "type": "choice", "n": 67, "row": 69, "ch": 3, "stem": "為了確保專案範圍被正確無誤的完成，範圍說明應該要由那些人簽核？", "opts": ["專案發起人和主要關係人", "專案經理和專案團隊成員", "公司的董事會", "組織內外的專案管理專家"], "ans": 0, "exp": "範圍說明應取得發起人及主要關係人認可，作為驗收與控制依據。", "note": ""}, {"id": "choice-68", "type": "choice", "n": 68, "row": 70, "ch": 3, "stem": "針對\"專案範圍\"的控制，其中一個簡單準則就是？", "opts": ["先找一些容易完成的活動試做，再檢討是否列入WBS 的活動", "沒有列入WBS 的活動不需要做", "即使沒有列入WBS的活動，也須視需要而做", "對於沒有列入WBS的活動，如資源許可，則與其他活動合併而做"], "ans": 1, "exp": "依題庫簡則，未列入 WBS 的活動不應自行加入；若需求有變，先走正式變更程序。", "note": ""}, {"id": "choice-69", "type": "choice", "n": 69, "row": 71, "ch": 3, "stem": "專案範圍說明的內容？", "opts": ["是外包合約的基礎", "為網路圖提供一個基礎", "由部門經理規劃", "是展開WBS 的依據"], "ans": 3, "exp": "範圍說明是進一步展開 WBS 的依據，先明確工作邊界，再做分解。", "note": ""}, {"id": "choice-70", "type": "choice", "n": 70, "row": 72, "ch": 3, "stem": "將專案範圍定義清楚的目的不是為了？", "opts": ["促進責任分工的明確", "定義範圍績效衡量和控制的基準", "規劃一個風險管理計畫", "展現專案團隊的管理能力"], "ans": 3, "exp": "範圍定義是為了分工、基準與規劃，不是展現團隊能力。", "note": ""}, {"id": "choice-71", "type": "choice", "n": 71, "row": 73, "ch": 3, "stem": "合約 WBS 是指？", "opts": ["外包工作的WBS", "專案工作的WBS", "材料供應的WBS", "以上皆是"], "ans": 0, "exp": "合約 WBS 聚焦外包合約中要完成的工作。", "note": ""}, {"id": "choice-72", "type": "choice", "n": 72, "row": 74, "ch": 3, "stem": "工作分解結構 (WBS) 的拆解方式是以那兩種導向為主？", "opts": ["任務導向和結果導向", "流程導向和任務導向", "成本導向和進度導向", "範圍導向和目標導向"], "ans": 1, "exp": "來源選 B，採「流程導向與任務導向」的課程分類。", "note": "來源答案為 B；PMI 常見 WBS 定義強調以可交付成果為導向的階層式分解。分類用語不同，請依課程題庫答案作答。"}, {"id": "choice-73", "type": "choice", "n": 73, "row": 75, "ch": 3, "stem": "WBS 是專案必須完成的項目，它的最底層是？", "opts": ["工作包", "活動", "範圍", "產品"], "ans": 0, "exp": "WBS 的最底層為工作包；工作包可在時程規劃時再轉成活動。", "note": ""}, {"id": "choice-74", "type": "choice", "n": 74, "row": 76, "ch": 3, "stem": "工作分解結構 (WBS) 的前提假設在於？", "opts": ["客戶需求表達完整", "專案目標說明正確", "專案範圍說明正確", "以上皆是"], "ans": 2, "exp": "正確的範圍說明是 WBS 分解的直接基礎。", "note": ""}, {"id": "choice-75", "type": "choice", "n": 75, "row": 77, "ch": 3, "stem": "WBS 上的項目通常都予以編號，以區別該工作的？", "opts": ["成本及工時", "範圍及品質", "類別及層級", "負責的單位"], "ans": 2, "exp": "WBS 編碼用來識別工作的類別與所在層級，便於追蹤及彙整。", "note": ""}, {"id": "choice-76", "type": "choice", "n": 76, "row": 78, "ch": 3, "stem": "工作包是？", "opts": ["不能再被進一步分解的細目", "具有唯一識別碼的任務", "工作方式的描述", "在工作分解結構最底層的可交付成果"], "ans": 3, "exp": "工作包是 WBS 最底層的工作或交付成果單元，不代表在任何意義下都不能再分解。", "note": ""}, {"id": "choice-77", "type": "choice", "n": 77, "row": 79, "ch": 3, "stem": "分解 WBS 的原則為何？", "opts": ["所有計畫皆應拆解到越詳細越好", "拆解到可以進行成本和工時的估計即可", "拆解到工期越短越好", "拆解到資源越少越好"], "ans": 1, "exp": "分解到可以合理估計成本與工時即可，不是越細越好。", "note": ""}, {"id": "choice-78", "type": "choice", "n": 78, "row": 80, "ch": 1, "stem": "大型專案的管理者稱為？", "opts": ["Project Manager", "Senior Project Manager", "Program Manager", "Project Manageme nt Associate"], "ans": 2, "exp": "依題庫用語，大型專案管理者為 Program Manager。", "note": ""}, {"id": "choice-79", "type": "choice", "n": 79, "row": 81, "ch": 3, "stem": "在選擇最適合的專案團隊成員前，第一步應該是？", "opts": ["確認候選人員清單", "確認組織的環境", "獲得主管同意", "建立工作分解結構"], "ans": 3, "exp": "先建立 WBS，才能辨識需要哪些工作與專長，再挑選適合的人員。", "note": ""}, {"id": "choice-80", "type": "choice", "n": 80, "row": 82, "ch": 1, "stem": "希望保有專案成員協同工作的環境，又想維持例行的部門時，最可能採用的組織架構是？", "opts": ["功能型組織", "專案型組織", "矩陣型組織", "部門型組織"], "ans": 2, "exp": "矩陣結構同時保留功能部門與跨部門專案協作的安排。", "note": ""}, {"id": "choice-81", "type": "choice", "n": 81, "row": 83, "ch": 1, "stem": "專案的發起人是？", "opts": ["制定專案計畫的人", "監督專案方向的人", "負責專案執行的人", "最終成果驗收的人"], "ans": 1, "exp": "發起人著重方向、支持及治理；專案經理負責日常執行管理。", "note": ""}, {"id": "choice-82", "type": "choice", "n": 82, "row": 84, "ch": 5, "stem": "除了什麼之外，都是建立良好團隊的例子？", "opts": ["專案經理對主管報告團隊動態", "獎勵和表揚制度", "將團隊集中同一個工作地點", "為了改善團隊成員的關係而進行的工作現場以外的活動"], "ans": 0, "exp": "向主管報告動態是管理報告行為，本身不是題庫列出的團隊建立措施。", "note": ""}, {"id": "choice-83", "type": "choice", "n": 83, "row": 85, "ch": 5, "stem": "分散各地的專案團隊常常不把自己看成團隊成員，專案經理如何處理？", "opts": ["制訂一些制度和規定，以鞏固分散的工作團隊之間的團結", "體認到這是雙輸的結局，因為不同地區的人做事和做人都只是當地的水準", "要求團隊成員遵守組織的遠景和使命", "確保每一位成員使用E-mail做為一種通訊工具"], "ans": 0, "exp": "分散團隊需要共同制度、規則與協作安排，單有電子郵件工具不足以建立團隊認同。", "note": ""}, {"id": "choice-84", "type": "choice", "n": 84, "row": 86, "ch": 5, "stem": "誰可以終止績效不良的大型專案？", "opts": ["專案組合管理者", "專案客戶", "專案推動委員會", "以上皆是"], "ans": 3, "exp": "依來源治理情境，組合管理者、客戶或推動委員會均可能有權終止大型專案。", "note": ""}, {"id": "choice-85", "type": "choice", "n": 85, "row": 87, "ch": 5, "stem": "下列何者不是矩陣型專案組織的缺點？", "opts": ["矩陣組織中獲得經驗不容易應用到其他專案組織中", "矩陣組織在監督和控制上是複雜的", "矩陣組織在溝通上是複雜的", "專案人員必須向不只一個上級報告"], "ans": 0, "exp": "矩陣常見難處包括溝通、控制及多頭報告；「經驗不易用於其他專案」不是本題缺點。", "note": ""}, {"id": "choice-86", "type": "choice", "n": 86, "row": 88, "ch": 5, "stem": "就專案團隊合作過程而言，下列何者最困難？", "opts": ["網路虛擬型組織", "強矩陣組織", "平衡矩陣", "功能型組織"], "ans": 0, "exp": "網路虛擬團隊分散各地，面對距離、溝通與信任建立的挑戰，來源選 A。", "note": ""}, {"id": "choice-87", "type": "choice", "n": 87, "row": 89, "ch": 5, "stem": "下列何種組織的專案經理在挑選專案成員時，應該就成員的特質與所屬部門主管商議？", "opts": ["功能型組織", "矩陣型組織", "網路虛擬型組織", "以上皆是"], "ans": 3, "exp": "依來源答案，不同組織形式在取得成員時都可能需要與所屬部門主管協商。", "note": ""}, {"id": "choice-88", "type": "choice", "n": 88, "row": 90, "ch": 5, "stem": "專案經理不考慮團隊成員提供的訊息，而獨自作出決定的管理領導風格是？", "opts": ["告知型", "推銷型", "參與型", "授權型"], "ans": 0, "exp": "經理自行決策並告知成員，對應告知型領導。", "note": ""}, {"id": "choice-89", "type": "choice", "n": 89, "row": 91, "ch": 5, "stem": "專案經理和團隊之間很少有訊息交流的管理領導模式稱為？", "opts": ["告知型", "推銷型", "參與型", "授權型"], "ans": 3, "exp": "依來源分類，授權型由成員承擔較多自主決策，經理與團隊直接訊息交流較少。", "note": ""}, {"id": "choice-90", "type": "choice", "n": 90, "row": 92, "ch": 5, "stem": "專案經理的權利依序遞增，何者正確？", "opts": ["功能型→弱矩陣→平衡矩陣→強矩陣→專案型", "弱矩陣→功能型→平衡矩陣→強矩陣→專案型", "平衡矩陣→弱矩陣→功能型→強矩陣→專案型", "專案型→弱矩陣→平衡矩陣→強矩陣→功能型"], "ans": 0, "exp": "經理權力由低到高：功能型、弱矩陣、平衡矩陣、強矩陣、專案型。", "note": ""}, {"id": "choice-91", "type": "choice", "n": 91, "row": 93, "ch": 3, "stem": "在進行範圍規劃時，專案經理的第一步應如何作為？", "opts": ["進行工作分解", "進行範圍的定義", "先進行需求再確認", "先進行責任指派"], "ans": 2, "exp": "範圍規劃先再次確認需求，才進一步定義範圍與分解工作。", "note": ""}, {"id": "choice-92", "type": "choice", "n": 92, "row": 94, "ch": 4, "stem": "專案進度規劃階段所進行的活動定義，其產出主要是指下列何者？", "opts": ["每個工作包所需完成的任務", "專案經理指定的工作", "WBS 的拆解項目", "合約書規定的執行項目"], "ans": 0, "exp": "活動定義把工作包轉為完成它所需的具體任務。", "note": ""}, {"id": "choice-93", "type": "choice", "n": 93, "row": 95, "ch": 4, "stem": "下列何者不屬於\"時程規劃\"的輸入項目？", "opts": ["WBS", "歷史資料", "範圍說明", "工作說明書"], "ans": 3, "exp": "依題庫列法，WBS、歷史資料與範圍說明是本題時程規劃輸入，排除工作說明書。", "note": ""}, {"id": "choice-94", "type": "choice", "n": 94, "row": 96, "ch": 4, "stem": "活動定義時，使用組織內部現有的模板(template)為一較為簡便的方式，但若沒有適當的模板可以參考時，應如何進行較佳？", "opts": ["因素分析法", "尋求PMO的資料協助", "類比估計法", "分解結構法"], "ans": 3, "exp": "沒有適合模板時，利用分解法把工作包拆成可安排的活動。", "note": ""}, {"id": "choice-95", "type": "choice", "n": 95, "row": 97, "ch": 4, "stem": "下列何者是\"虛活動\"的特性？", "opts": ["僅用於箭線式網路圖", "其工時為零", "不需要資源", "以上皆是"], "ans": 3, "exp": "虛活動用於箭線式網路圖表示邏輯關係，工時為零且不消耗資源。", "note": ""}, {"id": "choice-96", "type": "choice", "n": 96, "row": 98, "ch": 4, "stem": "在網路圖中進行前推計算可以獲得？", "opts": ["專案活動的總浮時", "完成專案活動項目所需要的資源數量", "確定活動能夠開始和結束的最早時間", "確定活動能夠開始和結束的最晚時間"], "ans": 2, "exp": "前推計算求最早開始 ES 與最早結束 EF；後推求最晚時間。", "note": ""}, {"id": "choice-97", "type": "choice", "n": 97, "row": 99, "ch": 4, "stem": "專案某文件要經過政府審核通過才能執行後續活動，這稱為是？", "opts": ["內部相依", "專案的要徑", "專案里程碑", "外部相依"], "ans": 3, "exp": "政府審查是外部單位控制的前置條件，屬外部相依。", "note": ""}, {"id": "choice-98", "type": "choice", "n": 98, "row": 100, "ch": 4, "stem": "PDM 和 ADM 主要的差別？", "opts": ["PDM可表示一種順序關係", "ADM可表示四種順序關係", "ADM有虛活動", "PDM沒有滯後關係"], "ans": 2, "exp": "ADM 可用虛活動表達相依；PDM 用節點表示活動，可表達不同先後關係。", "note": ""}, {"id": "choice-99", "type": "choice", "n": 99, "row": 101, "ch": 4, "stem": "下列何者是\"關鍵鏈 (critical chain)\"的特性？", "opts": ["通常比要徑長", "是資源衝突下的最短路徑", "是資源不衝突下的最長路徑", "通常與要徑長度一樣"], "ans": 2, "exp": "關鍵鏈考慮資源限制，來源選「資源不衝突下的最長路徑」。", "note": "關鍵鏈須把活動相依與資源限制一起納入，不能只記成一般未考慮資源的最長路徑。"}, {"id": "choice-100", "type": "choice", "n": 100, "row": 102, "ch": 4, "stem": "某科技公司新建廠房工程專案中，下列哪一類作業項目執行順序屬於外部相依？", "opts": ["環境評估通過後，才能進行後續的建廠", "例行工作完成及清場後，才可以開始進場施工", "高級顧問抵達後，才可以開始開會", "以上皆是"], "ans": 0, "exp": "環評核准來自外部審查單位，因此是本題明確的外部相依事件。", "note": ""}, {"id": "choice-101", "type": "choice", "n": 101, "row": 103, "ch": 4, "stem": "對於順序式圖解法的敘述，下列何者錯誤？", "opts": ["節點代表活動，箭頭代表作業順序關係", "畫出來的圖稱ＡＯＮ網路圖", "作業可以有四種先後順序關係", "作業由右邊的節點開始向左邊的節點進行"], "ans": 3, "exp": "PDM／AON 以節點表示活動，通常依左到右呈現順序，本題錯在由右往左的敘述。", "note": ""}, {"id": "choice-102", "type": "choice", "n": 102, "row": 104, "ch": 4, "stem": "裝潢完成時，傢俱與燈飾必須同時到位，這是什麼關係？", "opts": ["SS", "SF", "FF", "FS"], "ans": 2, "exp": "兩項工作完成時間須互相配合，對應完成到完成 FF 關係。", "note": ""}, {"id": "choice-103", "type": "choice", "n": 103, "row": 105, "ch": 4, "stem": "樂觀時間 6 天、正常時間 10 天、悲觀時間 18 天，則其標準差為？", "opts": ["1 天", "2 天", "3 天", "4 天"], "ans": 1, "exp": "PERT 標準差 σ =（悲觀 − 樂觀）÷ 6 =（18 − 6）÷ 6 = 2 天；正常時間不參與此公式。", "note": ""}, {"id": "choice-104", "type": "choice", "n": 104, "row": 106, "ch": 4, "stem": "限制理論認為員工所估工時，要刪去部分工時，是因為？", "opts": ["為了保護自己，一般人會超估", "提早完成不會報告", "學生症候群", "以上皆是"], "ans": 3, "exp": "依限制理論情境，安全工時、完成不即時回報與學生症候群都可能影響估工與執行。", "note": ""}, {"id": "choice-105", "type": "choice", "n": 105, "row": 107, "ch": 4, "stem": "CPM 和PERT 不同，其中之一是？", "opts": ["PERT 可以算出完成機率", "CPM可以算出完成機率", "PERT 以一個時間估計", "CPM以三個時間估計"], "ans": 0, "exp": "PERT 透過三點估計處理不確定性，在相關假設下可估算完成機率。", "note": ""}, {"id": "choice-106", "type": "choice", "n": 106, "row": 108, "ch": 4, "stem": "8-80 小時規劃原則是說？", "opts": ["活動工時不超過 8小時", "專案成員的工時指派儘量低於 80 小時", "工作包工時儘量不超過 80小時", "對 80 小時或以上的任務應衡量其績效"], "ans": 2, "exp": "來源以工作包工時盡量不超過 80 小時作為本題對 8–80 原則的重點。", "note": ""}, {"id": "choice-107", "type": "choice", "n": 107, "row": 109, "ch": 4, "stem": "網路圖的前推計算不能求出？", "opts": ["活動最早開始時間", "活動最晚開始時間", "活動最早結束時間", "以上皆可"], "ans": 1, "exp": "前推求 ES、EF，不能直接求 LS；最晚開始時間須由後推取得。", "note": ""}, {"id": "choice-108", "type": "choice", "n": 108, "row": 110, "ch": 4, "stem": "活動樂觀時間 6 天，正常時間 8 天，悲觀時間 10 天，那麼此活動的工時可以估計為？", "opts": ["4 天", "5 天", "6 天", "8 天"], "ans": 3, "exp": "PERT 期望工期 =（6 + 4×8 + 10）÷ 6 = 8 天。", "note": ""}, {"id": "choice-109", "type": "choice", "n": 109, "row": 111, "ch": 4, "stem": "三時估計法係利用哪三種時間來估計活動完成所需的時間？", "opts": ["悲觀、正常、樂觀", "最長、正常、最短", "最早、正常、最晚", "最可能、正常、最不可能"], "ans": 0, "exp": "三點估計使用樂觀、最可能（正常）及悲觀時間。", "note": ""}, {"id": "choice-110", "type": "choice", "n": 110, "row": 112, "ch": 4, "stem": "離專案發起時間越遠，不確定性越高，越不容易規劃清楚，因此將專案的早期、中期和晚期規劃成不同詳細程度的進度規劃方法稱為？", "opts": ["類比式規劃", "先期規劃", "滾浪式規劃", "漸進式規劃"], "ans": 2, "exp": "近期規劃較詳細、遠期較概略，隨資訊增加再展開，稱為滾浪式規劃。", "note": ""}, {"id": "choice-111", "type": "choice", "n": 111, "row": 113, "ch": 4, "stem": "為因應專案可遇見的風險，如地震、豪雨等可能造成的影響，會於工時估計時加入下列何者？", "opts": ["緊急儲備", "管理儲備", "虛活動", "更多人力資源"], "ans": 0, "exp": "對已識別風險的時間影響預留緩衝，題庫用語為緊急儲備。", "note": ""}, {"id": "choice-112", "type": "choice", "n": 112, "row": 114, "ch": 4, "stem": "下列敘述，何者有誤？", "opts": ["一個專案只有一條要徑", "總浮時為零的活動稱為關鍵活動", "要徑為網圖上時間最長的路徑", "總浮時等於最晚開始時間減最早開始時間"], "ans": 0, "exp": "專案可能同時有多條要徑，所以「只有一條」是錯誤敘述。", "note": ""}, {"id": "choice-113", "type": "choice", "n": 113, "row": 115, "ch": 4, "stem": "利用蒙地卡羅分析來推估專案的工時，需要找出影響專案工時的因素，這是因為此方法具有哪項特質？", "opts": ["悲觀工時、正常工時、樂觀工時", "統計分配", "隨機取樣", "歷史資料"], "ans": 1, "exp": "蒙地卡羅分析依機率分配反覆抽樣，來源以統計分配為本題答案。", "note": ""}, {"id": "choice-114", "type": "choice", "n": 114, "row": 116, "ch": 4, "stem": "某人估計回家車程大約需要 1 小時，最少為 45 分鐘，最多為1 小時 15 分鐘，根據這些估計，其標準差是多少？", "opts": ["5 分鐘", "10 分鐘", "15 分鐘", "35 分鐘"], "ans": 0, "exp": "先統一單位：最少 45 分鐘、最多 75 分鐘。σ =（75 − 45）÷ 6 = 5 分鐘。", "note": ""}, {"id": "choice-115", "type": "choice", "n": 115, "row": 117, "ch": 4, "stem": "活動 A 有三個前置活動，準時完成機率各為 50%，那麼活動 A 準時開始的機率為？", "opts": ["0.5", "0.25", "0.125", "0.15"], "ans": 2, "exp": "假設三個前置活動準時完成彼此獨立，且全部完成才能開始：0.5³ = 0.125。", "note": "相乘得到 0.125 的前提是三個前置活動準時完成彼此獨立；原題未明寫此假設。"}, {"id": "choice-116", "type": "choice", "n": 116, "row": 118, "ch": 4, "stem": "有關趕工，何者正確？", "opts": ["就是快速跟進", "從要徑趕工", "從非要徑趕工", "利用假日趕工"], "ans": 1, "exp": "縮短專案總工期須從要徑活動考慮趕工；只加速非要徑活動可能不改變完工日。", "note": ""}, {"id": "choice-117", "type": "choice", "n": 117, "row": 119, "ch": 4, "stem": "專案隨著時程進展逐步規劃詳細的作法，稱為？", "opts": ["漸進式規劃", "滾浪式規劃", "跳躍式規劃", "潛進式規劃"], "ans": 1, "exp": "逐步把近期工作規劃得更詳細，稱為滾浪式規劃。", "note": ""}, {"id": "choice-118", "type": "choice", "n": 118, "row": 120, "ch": 4, "stem": "資源拉平的目的是為了？", "opts": ["平衡資源的需求", "平衡資源的供給", "減少資源的需求", "減少資源的供給"], "ans": 0, "exp": "資源拉平把工作安排與可用資源配合，平衡各期間的資源需求。", "note": ""}, {"id": "choice-119", "type": "choice", "n": 119, "row": 121, "ch": 4, "stem": "如果專案落後，專案經理決定趕工以加快速度，他或她應該如何？", "opts": ["對要徑上趕工成本最低的任務進行趕工", "使用資源拉平以最佳化專案資源的生產率", "對最長工時的任務進行趕工", "要求全體人員在假日出來加班趕工"], "ans": 0, "exp": "比較要徑上活動的單位趕工成本，優先處理可行且成本較低的活動。", "note": ""}, {"id": "choice-120", "type": "choice", "n": 120, "row": 122, "ch": 4, "stem": "產品設計還沒有完成，就開始製作是？", "opts": ["趕工", "快速跟進", "順序錯誤", "違法行為"], "ans": 1, "exp": "把原本依序進行的設計與製作重疊，屬快速跟進；需注意返工風險。", "note": ""}, {"id": "choice-121", "type": "choice", "n": 121, "row": 123, "ch": 4, "stem": "活動實際工時和預定工時的差距，落在哪個範圍內算是高等精準度？", "opts": ["-10%到+25%", "-25%到+25%", "-10%到+10%", "-25%到+50%"], "ans": 2, "exp": "依來源分類，較高精準度的區間為 −10% 到 +10%。", "note": "估計精準度區間依估計類型與教材定義而異；本題保留來源 C。"}, {"id": "choice-122", "type": "choice", "n": 122, "row": 124, "ch": 4, "stem": "資源甘特圖是指？", "opts": ["考慮資源需求的甘特圖", "顯示可用資源的甘特圖", "控制資源消耗的甘特圖", "以上皆是"], "ans": 0, "exp": "資源甘特圖在時程呈現中加入資源需求資訊。", "note": ""}, {"id": "choice-123", "type": "choice", "n": 123, "row": 125, "ch": 4, "stem": "專案進度計畫經過核准後成為專案基準(schedule baseline)，一般來說，核准專案進度的人是？", "opts": ["專案發起人", "專案經理", "專案關係人", "專案副理"], "ans": 0, "exp": "依來源角色分工，進度計畫由發起人核准後成為進度基準。", "note": ""}, {"id": "choice-124", "type": "choice", "n": 124, "row": 126, "ch": 4, "stem": "某活動最早開始 3，最早結束 9，最晚開始3，最晚結束 13，說明了？", "opts": ["此作業不在要徑上", "此作業在要徑上", "此作業自由浮時為零", "進度計算錯誤"], "ans": 3, "exp": "固定工期下，EF−ES 與 LF−LS 應相同；本題為 6 與 10，不一致，故計算錯誤。", "note": ""}, {"id": "choice-125", "type": "choice", "n": 125, "row": 127, "ch": 5, "stem": "決定自製或外購的考量重點不包括？", "opts": ["時間", "成本", "範圍", "品質"], "ans": 2, "exp": "依來源答案，自製或外購的本題考量重點包括時間、成本、品質，排除範圍。", "note": ""}, {"id": "choice-126", "type": "choice", "n": 126, "row": 128, "ch": 5, "stem": "資源分解結構是主要表達？", "opts": ["資源需求的時間", "資源需求的種類", "資源需求的部門", "資源需求的活動"], "ans": 1, "exp": "資源分解結構依資源種類與類別分層，不是表達使用時間。", "note": ""}, {"id": "choice-127", "type": "choice", "n": 127, "row": 129, "ch": 5, "stem": "專案成員人格特質平衡主要是為了？", "opts": ["減少衝突", "促進溝通", "提高專案績效", "人力充分運用"], "ans": 2, "exp": "團隊人格特質互補的最終目的為提高整體績效，不只是避免衝突。", "note": ""}, {"id": "choice-128", "type": "choice", "n": 128, "row": 130, "ch": 5, "stem": "下列哪些是專案人力資源規劃的手法（或方法）？", "opts": ["人力需求分析", "關係人分析", "組織理論", "以上皆是"], "ans": 3, "exp": "人力規劃可結合需求分析、關係人分析與組織理論，因此選以上皆是。", "note": ""}, {"id": "choice-129", "type": "choice", "n": 129, "row": 131, "ch": 5, "stem": "專案團隊運作過程下列哪個時期顯得最為安靜？", "opts": ["組成期", "規範期", "混亂期", "行動期"], "ans": 0, "exp": "組成期成員仍在觀察與試探，通常較安靜；混亂期則容易出現意見衝突。", "note": ""}, {"id": "choice-130", "type": "choice", "n": 130, "row": 132, "ch": 5, "stem": "馬斯洛需求等級的最高層是？", "opts": ["社會需求", "成就需求", "安全需求", "自我實現"], "ans": 3, "exp": "馬斯洛需求層次的最高層是自我實現。", "note": ""}, {"id": "choice-131", "type": "choice", "n": 131, "row": 133, "ch": 5, "stem": "下列哪一項是屬於組織人力資源規劃的限制條件？", "opts": ["相關人員招募的程序", "專案預算的大小", "人員訓練的規定", "以上皆是"], "ans": 3, "exp": "招募程序、預算與訓練規定都會限制人力規劃的可選方案。", "note": ""}, {"id": "choice-132", "type": "choice", "n": 132, "row": 134, "ch": 5, "stem": "有關人力需求分析的程序，下列哪一項比較合理？", "opts": ["分析候選人員→確認專長需求→確認人員特質需求→確認潛在人員", "確認人員特質需求→分析候選人員→確認專長需求→確認潛在人員", "確認專長需求→確認人員特質需求→確認潛在人員→分析候選人員", "確認潛在人員→確認人員特質需求→分析候選人員→確認專長需求"], "ans": 2, "exp": "先確認專長，再確認特質，接著找出潛在人選，最後分析候選人員。", "note": ""}, {"id": "choice-133", "type": "choice", "n": 133, "row": 135, "ch": 5, "stem": "根據激勵的期望理論，以下何者正確？", "opts": ["績效不良是訓練不足的的結果", "個人行動與期望回饋的結果有關", "經理不應該對人期望太多", "獎金越高，人員工作越努力"], "ans": 1, "exp": "期望理論將行動動機連結到個人預期的結果與回饋。", "note": ""}, {"id": "choice-134", "type": "choice", "n": 134, "row": 136, "ch": 5, "stem": "在一個資源有限的專案中，以下描述何者正確？", "opts": ["專案必須在不超過資源的情況下被儘快完成", "專案必須儘可能利用較少的資源在一個確定的時間內完成", "在專案經理要求的時間內，部門經理不指派足夠的資源數量", "在使用比較少的資源下專案經理會得到獎賞"], "ans": 1, "exp": "來源選 B，描述在確定時間內盡可能少用資源，請留意題幹的限制類型。", "note": "題幹寫「資源有限」，通常會先限制資源，再求最早完成（近選項 A）；來源 B 描述的是期限固定下節省資源。此題依原檔 B 計分，建議向教師確認。"}, {"id": "choice-135", "type": "choice", "n": 135, "row": 137, "ch": 6, "stem": "預算編列的主要目的是？", "opts": ["確定為完成專案活動所需資源的費用，並將其分發到合適的帳號中", "將成本估算分發到每個工作細目上，並建立衡量專案績效的成本基準", "監控成本已發現與計畫的偏差", "提供完成專案活動所需資源的可能成本評估"], "ans": 1, "exp": "預算編列把成本估計分配到工作細目，建立日後衡量績效的成本基準。", "note": ""}, {"id": "choice-136", "type": "choice", "n": 136, "row": 138, "ch": 6, "stem": "成本估計需要知道？", "opts": ["資源可用性", "工作分解結構", "供應商清單", "以上皆非"], "ans": 1, "exp": "WBS 界定要完成的工作，為成本估計提供主要結構。", "note": ""}, {"id": "choice-137", "type": "choice", "n": 137, "row": 139, "ch": 6, "stem": "如果有一樁生意有 50% 的機會賺取 200萬元，有 20% 的機會損失 150 萬元，那麼這樁生意的期望利潤是多少？", "opts": ["30 萬元", "50 萬元", "70 萬元", "100 萬元"], "ans": 2, "exp": "依來源解法：期望利潤 = 50%×200 + 20%×(−150) = 70 萬元。", "note": "題目機率只列 50% + 20% = 70%。來源答案 70 萬元需假設其餘 30% 的損益為零；若剩餘情境有損益，需補上才能求完整期望值。"}, {"id": "choice-138", "type": "choice", "n": 138, "row": 140, "ch": 6, "stem": "為防範風險因素發生時導致成本超支，而增加的專案成本稱為？", "opts": ["緊急儲備", "管理儲備", "二次儲備", "潛在儲備"], "ans": 0, "exp": "針對已識別風險造成的成本影響預留金額，題庫用語為緊急儲備。", "note": ""}, {"id": "choice-139", "type": "choice", "n": 139, "row": 141, "ch": 6, "stem": "下列哪一項是成本估計的限制條件？", "opts": ["成員經驗", "專案新潁性", "精準度要求", "以上皆是"], "ans": 3, "exp": "成員經驗、專案新穎程度與要求的精準度都會限制成本估計。", "note": ""}, {"id": "choice-140", "type": "choice", "n": 140, "row": 142, "ch": 6, "stem": "下列哪一項不屬於成本規劃的產出？", "opts": ["成本管理計畫", "預算計畫", "風險清單", "估計精確度"], "ans": 3, "exp": "依來源答案，本題不將「估計精確度」列為獨立的成本規劃產出。", "note": ""}, {"id": "choice-141", "type": "choice", "n": 141, "row": 143, "ch": 6, "stem": "成本估計一定要在甚麼之前完成？", "opts": ["工時估計", "預算規劃", "進度規劃", "範圍規劃"], "ans": 1, "exp": "先估計各項成本，再彙整、配置成預算，因此成本估計先於預算規劃。", "note": ""}, {"id": "choice-142", "type": "choice", "n": 142, "row": 144, "ch": 6, "stem": "以歷史舊案的成本資料，來推估目前專案的成本，這種方法稱為？", "opts": ["模擬法", "類比法", "專家諮詢法", "參數模型法"], "ans": 1, "exp": "參考歷史相似專案推估新案成本，稱為類比法。", "note": ""}, {"id": "choice-143", "type": "choice", "n": 143, "row": 145, "ch": 6, "stem": "以下哪一種成本估計法較精確？", "opts": ["自下而上法", "類比估計法", "參數模型法", "電腦模擬法"], "ans": 0, "exp": "自下而上逐項估計再彙總，在工作定義充分時通常較精確，但也較費時。", "note": ""}, {"id": "choice-144", "type": "choice", "n": 144, "row": 146, "ch": 6, "stem": "成本規劃所得到的S 型曲線是？", "opts": ["預算曲線", "學習曲線", "成本曲線", "進度曲線"], "ans": 0, "exp": "成本預算依時間累積，形成 S 型預算曲線。", "note": ""}, {"id": "choice-145", "type": "choice", "n": 145, "row": 147, "ch": 6, "stem": "把費用投在某一個特定專案上，因而放棄其他專案的潛在利益稱為？", "opts": ["直接成本", "固定成本", "機會成本", "間接成本"], "ans": 2, "exp": "選擇某專案而放棄最佳替代選項的潛在利益，是機會成本。", "note": ""}, {"id": "choice-146", "type": "choice", "n": 146, "row": 148, "ch": 6, "stem": "何者是與兩個或多個活動有關，但又不是任何活動的專屬費用？", "opts": ["可變成本", "間接成本", "直接成本", "固定成本"], "ans": 1, "exp": "多個活動共同使用、無法直接歸屬單一活動的費用，屬間接成本。", "note": ""}, {"id": "choice-147", "type": "choice", "n": 147, "row": 149, "ch": 6, "stem": "專案規劃結束，核准的預算不夠時，專案經理應該先？", "opts": ["要求修改專案範圍", "要求提高專案預算", "進行專案價值分析", "拒絕擔任專案經理"], "ans": 2, "exp": "預算不足時先做價值分析，檢視功能與成本，再評估範圍或預算調整。", "note": ""}, {"id": "choice-148", "type": "choice", "n": 148, "row": 150, "ch": 6, "stem": "產業的一個經驗法則顯示：在中小型企業裡，專案的管理費用約佔整個專案預算的比例是多少？", "opts": ["0.1", "0.2", "0.15", "0.25"], "ans": 0, "exp": "來源經驗法則答案為 0.1，即 10%；屬課程題庫數值，不代表所有企業固定比例。", "note": "10% 是來源題庫的經驗值，實際管理費比例依規模、產業與專案而異。"}, {"id": "choice-149", "type": "choice", "n": 149, "row": 151, "ch": 6, "stem": "專案的融資計畫會在哪一個文件中呈現？", "opts": ["資源需求計畫", "風險管理計畫", "成本管理計畫", "財務管理計畫"], "ans": 3, "exp": "融資來源與資金安排屬財務管理計畫。", "note": ""}, {"id": "choice-150", "type": "choice", "n": 150, "row": 152, "ch": 6, "stem": "下列哪一項是專案預算規劃的產出？", "opts": ["S 曲線圖", "活動預算表", "工作包預算", "以上皆是"], "ans": 3, "exp": "預算規劃可產出工作包預算、活動預算表與累積的 S 曲線，因此選以上皆是。", "note": ""}, {"id": "calc-1", "type": "calc", "n": 1, "ch": 6, "stem": "某專案初始投資150萬元，第1年收入100萬元、支出20萬元，第2年收入110萬元、支出10萬元。僅考慮上述現金流，年折現率10%，淨現值及不折現回收年限約為多少？", "opts": ["30萬元；1.5年", "5.37萬元；1.7年", "−5.37萬元；1.7年", "5.37萬元；2年"], "ans": 1, "exp": "第1年淨現金流＝100−20＝80萬元，第2年＝110−10＝100萬元。\nNPV＝80÷1.1＋100÷1.1²−150≈5.37萬元。\n回收年限＝1＋（150−80）÷100＝1.7年（假設年內均勻回收）。", "note": ""}, {"id": "calc-2", "type": "calc", "n": 2, "ch": 6, "stem": "某商店初始投資750萬元，第1年收入600萬元、支出50萬元，第2年收入650萬元、支出45萬元。年折現率10%，採年度折現現金流並以年內比例估算，淨現值及折現回收年限為多少？", "opts": ["405萬元；1.5年", "250萬元；2年", "155萬元；1.33年", "250萬元；1.5年"], "ans": 3, "exp": "第1年折現淨現金流＝（600−50）÷1.1＝500萬元。\n第2年＝（650−45）÷1.1²＝500萬元。\nNPV＝500＋500−750＝250萬元；折現回收年限＝1＋250÷500＝1.5年。", "note": ""}, {"id": "calc-9", "type": "calc", "n": 9, "ch": 7, "stem": "成本加成本百分比合約（CPPC）估計成本120,000元，利潤為實際成本10%。實際成本130,000元，應支付總價為多少？", "opts": ["132,000元", "143,000元", "142,000元", "153,000元"], "ans": 1, "exp": "利潤＝130,000×10%＝13,000元。總支付＝實際成本＋利潤＝130,000＋13,000＝143,000元。", "note": ""}, {"id": "calc-10", "type": "calc", "n": 10, "ch": 7, "stem": "成本加獎勵酬金合約（CPIF）目標成本150,000元、目標酬金15,000元，節省成本由買方與承包商按80：20分配。實際成本130,000元，承包商酬金為多少？", "opts": ["4,000元", "15,000元", "35,000元", "19,000元"], "ans": 3, "exp": "節省成本＝150,000−130,000＝20,000元；承包商獎勵＝20,000×20%＝4,000元。酬金＝15,000＋4,000＝19,000元。本題問酬金，非含成本的總支付。", "note": ""}, {"id": "calc-11", "type": "calc", "n": 11, "ch": 7, "stem": "CPIF合約目標成本150,000元、目標酬金15,000元，成本差異由買方與承包商按70：30分攤。實際成本180,000元，不設酬金上下限，買方總支付為多少？", "opts": ["186,000元", "174,000元", "195,000元", "204,000元"], "ans": 0, "exp": "成本超支＝180,000−150,000＝30,000元。承包商酬金減少30,000×30%＝9,000元，剩6,000元。總支付＝180,000＋6,000＝186,000元。", "note": ""}, {"id": "calc-12", "type": "calc", "n": 12, "ch": 7, "stem": "某工程支付總額＝實際成本＋目標成本×20%＋（目標成本−實際成本）×30%。目標成本800萬元，實際成本1,000萬元，支付總額為多少？", "opts": ["940萬元", "1,160萬元", "1,100萬元", "1,220萬元"], "ans": 2, "exp": "固定酬金＝800×20%＝160萬元；獎罰調整＝（800−1,000）×30%＝−60萬元。支付總額＝1,000＋160−60＝1,100萬元。", "note": ""}, {"id": "calc-13", "type": "calc", "n": 13, "ch": 7, "stem": "某工程支付總額＝實際成本＋目標成本×30%＋（目標成本−實際成本）×10%。目標成本1,000萬元，原依實際成本900萬元結算，後發現漏列材料費100萬元。重新結算應增加或退回多少？", "opts": ["增加100萬元", "增加90萬元", "增加120萬元", "退回90萬元"], "ans": 1, "exp": "原支付＝900＋1,000×30%＋（1,000−900）×10%＝1,210萬元。\n修正實際成本＝900＋100＝1,000萬元；修正支付＝1,000＋300＋0＝1,300萬元。應增加1,300−1,210＝90萬元。固定酬金前後均以目標成本計算。", "note": ""}, {"id": "calc-14", "type": "calc", "n": 14, "ch": 4, "stem": "某活動樂觀時間6天、最可能時間9天、悲觀時間18天，採PERT三點估算法，期望工期及標準差為何？", "opts": ["11天、2天", "10天、4天", "9天、3天", "10天、2天"], "ans": 3, "exp": "PERT期望工期＝（樂觀＋4×最可能＋悲觀）÷6＝（6＋4×9＋18）÷6＝10天。\n標準差＝（悲觀−樂觀）÷6＝（18−6）÷6＝2天。", "note": ""}, {"id": "calc-15", "type": "calc", "n": 15, "ch": 4, "stem": "整地工程順利時5天、一般情況8天、不利時17天。採PERT三點估算法，期望工期及標準差為何？", "opts": ["9天、2天", "10天、2天", "9天、3天", "8天、2天"], "ans": 0, "exp": "期望工期＝（5＋4×8＋17）÷6＝54÷6＝9天。標準差＝（17−5）÷6＝2天。", "note": ""}];
+const STORE='international_pm_quiz_v1', RUN=STORE+'_session';
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const lines=s=>esc(s).replace(/\n/g,'<br>');
+const letters=['A','B','C','D'];
+const read=(k,f)=>{try{return JSON.parse(localStorage.getItem(k))??f;}catch{return f;}};
+let storageOK=true;
+function write(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch{storageOK=false;}}
+const dict=v=>v&&typeof v==='object'&&!Array.isArray(v)?v:{};
+let saved=dict(read(STORE,{})), history=dict(saved.history),drafts=dict(saved.drafts);
+const known=new Set(QUESTIONS.map(q=>q.id));
+history=Object.fromEntries(Object.entries(history).filter(([id,v])=>known.has(id)&&['correct','wrong'].includes(v)));
+let tab=['choice','calc'].includes(saved.tab)?saved.tab:'choice',count=10,session=null;
+const pool=()=>QUESTIONS.filter(q=>q.type===tab);
+const save=()=>write(STORE,{history,drafts,tab});
+const saveRun=()=>write(RUN,session);
+const byId=id=>QUESTIONS.find(q=>q.id===id);
+const stats=qs=>{const done=qs.filter(q=>history[q.id]);const ok=done.filter(q=>history[q.id]==='correct').length;return{done:done.length,ok,wrong:done.length-ok,rate:done.length?Math.round(ok/done.length*100):0};};
+function shuffle(arr){const a=arr.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+const btn=(text,action,cls='btn-primary',extra='')=>`<button class="${cls}" data-action="${action}" ${extra}>${text}</button>`;
+const meta=q=>`${q.type==='choice'?'Excel 觀念':'Word 計算'}第 ${q.n} 題 · ${q.type==='choice'?'選擇題!B'+q.row+':G'+q.row:'原題號 '+q.n}`;
+const status=q=>history[q.id]==='correct'?'已答對':history[q.id]==='wrong'?'待複習':'尚未練習';
+const note=q=>q.note?`<aside class="source-note"><strong>來源補充與疑義</strong><br>${lines(q.note)}</aside>`:'';
+function mount(html){$('#app').innerHTML=html;window.scrollTo(0,0);}
+function validRun(s){return s&&Array.isArray(s.ids)&&s.ids.length&&new Set(s.ids).size===s.ids.length&&s.ids.every(id=>known.has(id))&&Number.isInteger(s.idx)&&s.idx>=0&&s.idx<s.ids.length&&s.answers&&typeof s.answers==='object'&&!Array.isArray(s.answers)&&s.ids.every(id=>byId(id).type===byId(s.ids[0]).type)&&Object.entries(s.answers).every(([id,a])=>s.ids.includes(id)&&a&&Number.isInteger(a.chosen)&&a.chosen>=0&&a.chosen<4&&typeof a.correct==='boolean');}
+function cardStat(label,value){return `<div class="stat-card"><div class="stat-label">${label}</div><div class="stat-num">${value}</div></div>`;}
+function home(){
+ const qs=pool(),s=stats(qs),pending=read(RUN,null),resume=validRun(pending);
+ mount(`<header class="site-header"><span class="eyebrow">IPMA STUDY · MIDTERM</span><h1>國際專案管理刷題</h1><p>期中考複習 · 組織、範圍、時程與成本<br>150 題觀念選擇 + 9 題計算選擇</p></header>
+ <nav class="exam-tabs" aria-label="題庫類別"><button class="exam-tab ${tab==='choice'?'active':''}" data-tab="choice" aria-pressed="${tab==='choice'}">觀念題庫<span class="tab-sub">Excel · 150 題</span></button><button class="exam-tab ${tab==='calc'?'active':''}" data-tab="calc" aria-pressed="${tab==='calc'}">計算題庫<span class="tab-sub">Word · 9 題</span></button></nav>
+ <div class="stat-grid">${cardStat('題庫總數',qs.length)+cardStat('已作答',s.done)+cardStat('待複習',s.wrong)+cardStat('最近作答正確率',s.rate+'%')}</div><p class="stats-help">每題以最近一次答案統計，答對後移出錯題本。</p>
+ ${!storageOK?'<p class="source-note" role="status">瀏覽器無法儲存紀錄，本次可繼續練習，關閉後可能遺失。</p>':''}
+ ${resume?`<div class="resume-card"><span>上次${byId(pending.ids[0]).type==='calc'?'計算':'觀念'}練習 · 第 ${pending.idx+1}／${pending.ids.length} 題</span>${btn('繼續練習','resume','btn-small')}</div>`:''}
+ <label class="sr-only" for="search">搜尋題目、選項與解析</label><input id="search" type="search" class="search-input" placeholder="搜尋題目、選項、公式或題號…" autocomplete="off"><div id="results" aria-live="polite"></div>
+ <h2>選擇練習方式</h2>
+ ${btn('<span class="mode-title">📖 依主題練習</span><span class="mode-desc">依觀念分組，保留附件原題號</span>','topics','mode-card full')}
+ ${btn('<span class="mode-title">☷ 依原題號練習</span><span class="mode-desc">從第一題開始，按來源順序完整練習</span>','ordered','mode-card full')}
+ <div class="mode-card-static"><div class="mode-title">🎲 隨機抽題</div><div class="mode-desc">目前題庫隨機洗牌，不重複出題</div><div class="count-row">${[...new Set([5,10,20,30,50,qs.length].filter(n=>n<=qs.length))].map(n=>`<button class="count-pill ${n===Math.min(count,qs.length)?'active':''}" data-count="${n}" aria-pressed="${n===Math.min(count,qs.length)}">${n===qs.length?'全部 '+n+' 題':n+' 題'}</button>`).join('')}</div>${btn('開始隨機練習 →','random')}</div>
+ ${btn(`<span class="mode-title">✎ 錯題複習 <span class="badge">${s.wrong}</span></span><span class="mode-desc">${s.wrong?'集中練習尚未答對的題目':'目前沒有待複習題目'}</span>`,'wrong','mode-card full',s.wrong?'':'disabled')}
+ ${btn('<span class="mode-title">∑ 公式與觀念速查</span><span class="mode-desc">NPV、回收年限、合約酬金、PERT 與浮時</span>','formulas','mode-card full')}
+ <details class="about"><summary>題庫來源、計分與紀錄說明</summary><p>觀念題取自「期中考範圍.xlsx」的「選擇題」工作表，共 150 題。計算題取自「專案管理計算題期中考.docx」，共 9 題；原題號為 1、2、9～15，沒有補造缺少的題號。</p><p>所有題目保留原選項順序，依附件標準答案計分。Excel 原檔未附解析，觀念解析為整理補充；Word 計算解析依原檔。部分定義與答案有疑義，已在題目解析另列說明。</p><p>主題分組是本工具新增的複習分類。紀錄與計算草稿保存在此瀏覽器，不上傳伺服器，也不與投資學網站共用。清除網站資料或換裝置可能失去紀錄。</p><p>補充參考：<a href="https://ipma.world/ipma-certification/4lc/certified-senior-project-manager-level-b/" target="_blank" rel="noopener">IPMA B 級</a>、<a href="https://www.pmi.org/learning/library/developing-elaborating-work-breakdown-structures-7241" target="_blank" rel="noopener">PMI 的 WBS 說明</a>。</p></details>
+ ${s.done?btn('清除目前題庫作答紀錄','reset','btn-secondary'):''}<footer>國際專案管理期中考 · 共 159 題<br><a href="https://github.com/Breitiling0830/project-management-quiz" target="_blank" rel="noopener">GitHub 原始碼 ↗</a></footer>`);
+ $('#search').addEventListener('input',search);
+}
+function search(){const kw=$('#search').value.trim().toLowerCase();$('#results').style.display=kw?'block':'none';if(!kw)return;const found=pool().filter(q=>(String(q.n)===kw||(q.stem+' '+q.opts.join(' ')+' '+q.exp+' '+q.note).toLowerCase().includes(kw)));$('#results').innerHTML=`<p class="search-count">找到 ${found.length} 題 · 點選查看答案</p>`+found.map(q=>`<button class="search-item full" data-preview="${q.id}"><span class="search-item-meta">${meta(q)} · ${status(q)}</span><span class="search-item-stem">${esc(q.stem.slice(0,85))}${q.stem.length>85?'…':''}</span></button>`).join('')+(found.length?'':'<p class="search-empty">找不到題目，試試「PERT」、「WBS」或題號。</p>');}
+function topics(){mount(`${btn('← 返回首頁','home','btn-back')}<h1>依主題練習</h1><p class="muted">${tab==='choice'?'觀念題庫':'計算題庫'} · 按來源原題號排序</p>${Object.entries(TOPICS).map(([id,name])=>{const qs=pool().filter(q=>q.ch===+id);if(!qs.length)return '';const s=stats(qs);return btn(`<span class="mode-title">${name}</span><span class="mode-desc">${qs.length} 題 · 已做 ${s.done} · 答對 ${s.ok}</span>`,'topic-'+id,'mode-card full');}).join('')}`);}
+function preview(id){const q=byId(id);if(!q)return;mount(`${btn('← 返回首頁','home','btn-back')}<p class="meta-row">${meta(q)}</p><article class="q-card"><div class="q-stem">${lines(q.stem)}</div>${q.opts.map((o,i)=>`<div class="opt ${i===q.ans?'correct':''}"><span class="opt-key">${letters[i]}.</span>${esc(o)}${i===q.ans?' ✓':''}</div>`).join('')}<div class="explain"><b>來源標準答案：${letters[q.ans]}</b>${lines(q.exp)}</div>${note(q)}</article>${btn('練習這一題','single-'+q.id)}`);}
+function start(mode,qs){if(!qs.length)return;session={mode,ids:qs.map(q=>q.id),idx:0,answers:{}};saveRun();question();}
+function question(){
+ const q=byId(session.ids[session.idx]),record=session.answers[q.id],done=!!record;
+ mount(`${btn('← 返回首頁（自動保留進度）','home','btn-back')}<div class="meta-row"><span>${esc(session.mode)}</span><span>第 ${session.idx+1}／${session.ids.length} 題</span></div><div class="progress-bar" role="progressbar" aria-label="練習進度" aria-valuemin="0" aria-valuemax="${session.ids.length}" aria-valuenow="${session.idx+(done?1:0)}"><div class="progress-fill" style="width:${(session.idx+(done?1:0))/session.ids.length*100}%"></div></div><p class="meta-row">${meta(q)}<br>${TOPICS[q.ch]}</p>
+ <article class="q-card"><div class="q-stem">${lines(q.stem)}</div>
+ ${q.type==='calc'?`<details class="scratch" ${typeof drafts[q.id]==='string'&&drafts[q.id]?'open':''}><summary>✎ 展開計算草稿</summary><label class="sr-only" for="draft">本題計算草稿</label><textarea id="draft" rows="4" placeholder="先算出答案再選擇，草稿自動儲存在此瀏覽器…">${esc(typeof drafts[q.id]==='string'?drafts[q.id]:'')}</textarea></details>`:''}
+ <div class="options">${q.opts.map((o,i)=>`<button class="opt ${done?(i===q.ans?'correct':i===record.chosen?'wrong':''):''}" data-answer="${i}" ${done?'disabled':''}><span class="opt-key">${letters[i]}.</span><span>${esc(o)}${done&&i===q.ans?' · 標準答案':''}${done&&i===record.chosen?'（你的選擇）':''}</span></button>`).join('')}</div>
+ <div id="feedback" aria-live="polite">${done?`<div class="explain"><b>${record.correct?'✓ 答對了':'✗ 答錯了'} · 來源標準答案：${letters[q.ans]}</b>${lines(q.exp)}</div>${note(q)}${btn(session.idx===session.ids.length-1?'完成這輪練習':'下一題 →','next')}`:''}</div></article>`);
+ const draft=$('#draft');if(draft)draft.addEventListener('input',()=>{drafts[q.id]=draft.value;save();});
+}
+function answer(chosen){const q=byId(session.ids[session.idx]);if(session.answers[q.id]||!Number.isInteger(chosen)||chosen<0||chosen>=q.opts.length)return;const correct=chosen===q.ans;session.answers[q.id]={chosen,correct};history[q.id]=correct?'correct':'wrong';save();saveRun();question();}
+function complete(){const total=session.ids.length,ok=Object.values(session.answers).filter(a=>a.correct).length;session.retry=session.ids.filter(id=>!session.answers[id].correct);write(RUN,null);mount(`<div class="complete"><span class="eyebrow">SESSION COMPLETE</span><h1>完成這輪練習！</h1><p class="muted">${esc(session.mode)}</p><div class="stat-grid">${cardStat('本輪題數',total)+cardStat('答對',ok)+cardStat('正確率',Math.round(ok/total*100)+'%')+cardStat('答錯',total-ok)}</div>${session.retry.length?btn('再練這輪錯題','retry'):''}${btn('回到首頁','home','btn-secondary')}</div>`);}
+const FORMULAS=[
+ ['淨現值 NPV','NPV = −I₀ + Σ [CFₜ ÷ (1 + r)ᵗ]','CFₜ = 當期收入 − 當期支出。先求淨現金流，再折現；初始投資在第 0 年，不再折現。'],
+ ['不折現回收年限','完整回收前的年數 + 尚未回收金額 ÷ 下一年淨現金流','Word 第 1 題：1 + (150 − 80) ÷ 100 = 1.7 年。此比例法假設年內均勻回收。'],
+ ['折現回收年限','先逐年折現，再用折現現金流累計回收','Word 第 2 題：折現後每年 500 萬，1 + (750 − 500) ÷ 500 = 1.5 年。題目採年度折現及年內比例估算。'],
+ ['成本加成本百分比 CPPC','總支付 = 實際成本 × (1 + 利潤率)','百分比以實際成本為基礎。Word 第 9 題：130,000 × 1.10 = 143,000 元。'],
+ ['成本加獎勵酬金 CPIF','酬金 = 目標酬金 + (目標成本 − 實際成本) × 承包商分攤率','總支付 = 實際成本 + 調整後酬金。成本超支時括號為負；注意買方：承包商的分配順序，並依合約酬金上下限處理。'],
+ ['付款公式與漏列成本','支付 = AC + TC × 固定酬金率 + (TC − AC) × 調整率','TC 為目標成本，AC 為實際成本。只修正實際成本 ΔAC 時，支付變化 = ΔAC × (1 − 調整率)，目標成本固定項不變。'],
+ ['PERT 三點估計','期望工期 tₑ = (a + 4m + b) ÷ 6','a 樂觀、m 最可能、b 悲觀。標準差 σ = (b − a) ÷ 6；變異數 = σ²，不要把標準差與變異數混用。'],
+ ['網路圖與浮時','EF = ES + 工期；LS = LF − 工期','總浮時 TF = LS − ES = LF − EF。前推求 ES／EF；後推求 LS／LF。多前置取最大 EF，多後續取最小 LS。'],
+ ['期望值與前置活動機率','EMV = Σ pᵢ × 結果ᵢ','獲利取正、損失取負，完整情境機率總和為 1。若所有前置都須準時且彼此獨立，準時開始機率等於各機率相乘。'],
+ ['進度壓縮與 WBS','趕工：增加資源；快速跟進：重疊活動','先檢視要徑與限制。WBS 最底層為工作包，工作包可再展開時程活動；經核准的範圍變更需同步更新相關基準。']
+];
+function formulas(){mount(`${btn('← 返回首頁','home','btn-back')}<h1>公式與觀念速查</h1><p class="muted">配合兩份附件整理，計算前先確認單位與題目假設。</p>${FORMULAS.map(([title,f,desc])=>`<section class="q-card"><h2>${title}</h2><p class="formula">${esc(f)}</p><p class="muted">${esc(desc)}</p></section>`).join('')}`);}
+document.addEventListener('click',e=>{const t=e.target.closest('button');if(!t||t.disabled)return;
+ if(t.dataset.tab){tab=t.dataset.tab;save();home();return;}
+ if(t.dataset.count){count=+t.dataset.count;document.querySelectorAll('[data-count]').forEach(b=>{b.classList.toggle('active',b===t);b.setAttribute('aria-pressed',b===t);});return;}
+ if(t.dataset.preview){preview(t.dataset.preview);return;}
+ if(t.dataset.answer!==undefined){answer(+t.dataset.answer);return;}
+ const a=t.dataset.action;if(!a)return;
+ if(a==='home')home();else if(a==='topics')topics();else if(a==='formulas')formulas();
+ else if(a==='ordered')start('依原題號練習',pool());
+ else if(a==='random')start('隨機抽題',shuffle(pool()).slice(0,Math.min(count,pool().length)));
+ else if(a==='wrong')start('錯題複習',shuffle(pool().filter(q=>history[q.id]==='wrong')));
+ else if(a.startsWith('topic-')){const ch=+a.slice(6);start(TOPICS[ch],pool().filter(q=>q.ch===ch));}
+ else if(a.startsWith('single-'))start('單題練習',[byId(a.slice(7))]);
+ else if(a==='resume'){const pending=read(RUN,null);if(!validRun(pending)){home();return;}session=pending;tab=byId(session.ids[0]).type;save();question();}
+ else if(a==='next'){if(session.idx===session.ids.length-1)complete();else{session.idx++;saveRun();question();}}
+ else if(a==='retry')start('本輪錯題複習',session.retry.map(byId));
+ else if(a==='reset'&&confirm('確定清除目前題庫的作答紀錄？另一題庫與計算草稿會保留。')){const ids=new Set(pool().map(q=>q.id));ids.forEach(id=>delete history[id]);save();const pending=read(RUN,null);if(pending?.ids?.some(id=>ids.has(id)))write(RUN,null);home();}
+});
+home();
+
+</script></body></html>
